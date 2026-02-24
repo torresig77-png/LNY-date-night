@@ -1,0 +1,956 @@
+<!--
+================================================================================
+  README — GitHub Pages Form
+================================================================================
+
+  SETUP INSTRUCTIONS:
+  1. Drop this file into a GitHub repository as `index.html`
+  2. Go to Settings → Pages → Source: main branch → Save
+  3. Your form will be live at https://YOUR_USERNAME.github.io/REPO_NAME
+
+  ── FORMSPREE (recommended) ──────────────────────────────────────────────────
+  1. Sign up at https://formspree.io and create a new form
+  2. Copy your endpoint, e.g. https://formspree.io/f/xabcdefg
+  3. Find the line below: const FORMSPREE_ENDPOINT = "..."
+  4. Replace the placeholder with your real endpoint
+
+  ── GOOGLE SHEETS (alternative) ──────────────────────────────────────────────
+  1. Create a Google Sheet, then go to Extensions → Apps Script
+  2. Paste the Apps Script web app code from:
+     https://github.com/levinunnick/Spreadsheet-forms
+  3. Deploy as a web app and copy the URL
+  4. Replace FORMSPREE_ENDPOINT with your Apps Script URL
+  5. Change method="POST" to fetch with JSON body if needed
+
+  ── GOOGLE ANALYTICS GA4 ─────────────────────────────────────────────────────
+  1. Get your Measurement ID from GA4 (looks like G-XXXXXXXXXX)
+  2. Find: const GA_MEASUREMENT_ID = "..."
+  3. Replace with your real ID
+
+  ── COLORS ───────────────────────────────────────────────────────────────────
+  All colors are CSS variables at the top of the <style> block.
+  Edit --primary and --accent to match your brand.
+
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey Form</title>
+
+  <!-- Google Fonts: Clash Display + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── CONFIG: Edit your brand colors here ── */
+    :root {
+      --primary: #6EE7B7;
+      --accent:  #F472B6;
+      --primary-dim: rgba(110,231,183,0.15);
+      --accent-dim:  rgba(244,114,182,0.15);
+    }
+
+    /* ── DARK THEME (default) ── */
+    [data-theme="dark"] {
+      --bg:          #0D0F14;
+      --surface:     #161921;
+      --surface-2:   #1E2330;
+      --border:      #2A3042;
+      --text:        #E8EDF5;
+      --text-muted:  #8891A8;
+      --shadow:      rgba(0,0,0,0.5);
+      --progress-bg: #1E2330;
+    }
+
+    /* ── LIGHT THEME ── */
+    [data-theme="light"] {
+      --bg:          #F5F7FC;
+      --surface:     #FFFFFF;
+      --surface-2:   #EEF1F8;
+      --border:      #D4D9E8;
+      --text:        #111827;
+      --text-muted:  #6B7280;
+      --shadow:      rgba(0,0,0,0.08);
+      --progress-bg: #E5E9F2;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      transition: background 0.3s, color 0.3s;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(110,231,183,0.07) 0%, transparent 70%);
+      top: -100px; left: -100px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(244,114,182,0.07) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+    }
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
+      position: fixed;
+      top: 1.25rem; right: 1.25rem;
+      z-index: 100;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 0.4rem 0.75rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+    .theme-toggle:hover { color: var(--primary); border-color: var(--primary); }
+    .theme-toggle .icon { font-size: 1rem; transition: transform 0.4s; }
+    .theme-toggle:hover .icon { transform: rotate(20deg); }
+
+    /* ── CARD ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2.5rem 2rem;
+      width: 100%;
+      max-width: 580px;
+      box-shadow: 0 24px 64px var(--shadow);
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    /* ── HEADER ── */
+    .form-header { margin-bottom: 2rem; }
+    .form-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    .form-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .form-subtitle {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap { margin-bottom: 2rem; }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .progress-meta span:last-child { color: var(--primary); font-weight: 600; }
+    .progress-track {
+      height: 4px;
+      border-radius: 99px;
+      background: var(--progress-bg);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ── STEP DOTS ── */
+    .step-dots {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+    .step-dot.active { background: var(--primary); transform: scale(1.3); }
+    .step-dot.done   { background: var(--primary); opacity: 0.4; transform: scale(1); }
+
+    /* ── STEPS ── */
+    .step {
+      display: none;
+      animation: stepIn 0.35s ease forwards;
+    }
+    .step.active { display: block; }
+
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── FIELD GROUPS ── */
+    .field { margin-bottom: 1.25rem; }
+    .field label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.01em;
+    }
+    .field label span.req { color: var(--accent); margin-left: 2px; }
+
+    /* Inputs & Selects & Textarea */
+    .field input[type="text"],
+    .field input[type="email"],
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.92rem;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236EE7B7' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+    .field textarea { resize: vertical; min-height: 110px; }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-dim);
+      background: var(--surface);
+    }
+    .field input.error,
+    .field select.error,
+    .field textarea.error {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    /* Textarea counter */
+    .textarea-wrap { position: relative; }
+    .char-counter {
+      position: absolute;
+      bottom: 0.5rem; right: 0.75rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+    .char-counter.warn  { color: var(--accent); }
+    .char-counter.limit { color: #EF4444; }
+
+    /* Error messages */
+    .error-msg {
+      font-size: 0.78rem;
+      color: var(--accent);
+      margin-top: 0.3rem;
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .error-msg.visible { display: flex; }
+    .error-msg::before { content: '⚠'; font-size: 0.8rem; }
+
+    /* ── CHECKBOXES ── */
+    .checkbox-group { display: flex; flex-direction: column; gap: 0.6rem; }
+    .checkbox-item { display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; }
+    .checkbox-item input[type="checkbox"] { display: none; }
+    .check-box {
+      width: 20px; height: 20px;
+      min-width: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      margin-top: 1px;
+    }
+    .check-box svg { display: none; width: 11px; height: 11px; }
+    .checkbox-item input:checked ~ .check-box {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .checkbox-item input:checked ~ .check-box svg { display: block; }
+    .checkbox-item:hover .check-box { border-color: var(--primary); }
+    .check-label { font-size: 0.9rem; line-height: 1.5; color: var(--text); }
+    .check-label small { display: block; color: var(--text-muted); font-size: 0.78rem; }
+
+    /* ── RADIO / RATING ── */
+    .rating-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .rating-btn {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .rating-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .rating-btn.selected {
+      background: var(--primary-dim);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.75rem;
+    }
+    .btn {
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.7rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.01em;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #34D399);
+      color: #0D1117;
+      flex: 1;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(110,231,183,0.3); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--accent), #E879F9);
+      color: #fff;
+      flex: 1;
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(244,114,182,0.35); }
+    .btn[disabled] { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* Spinner in button */
+    .btn-submit .spinner {
+      display: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 0.5rem;
+    }
+    .btn-submit.loading .spinner { display: inline-block; }
+    .btn-submit.loading .btn-text { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── THANK YOU SCREEN ── */
+    .thank-you {
+      display: none;
+      text-align: center;
+      padding: 1.5rem 0;
+      animation: stepIn 0.4s ease forwards;
+    }
+    .thank-you.show { display: block; }
+    .ty-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      display: block;
+      animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes pop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+    .ty-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .ty-msg { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
+    .ty-detail {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--surface-2);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .ty-detail p { font-size: 0.82rem; color: var(--text-muted); }
+    .ty-detail p strong { color: var(--primary); }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── AUTOSAVE NOTICE ── */
+    .autosave-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      color: var(--primary);
+      opacity: 0;
+      transition: opacity 0.5s;
+      margin-top: 0.75rem;
+    }
+    .autosave-badge.show { opacity: 1; }
+    .autosave-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.75rem 1.25rem 1.5rem; }
+      .form-title { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span class="icon" id="theme-icon">☀️</span>
+    <span id="theme-label">Light</span>
+  </button>
+
+  <!-- Main Card -->
+  <div class="card" id="main-card">
+
+    <!-- Header -->
+    <div class="form-header" id="form-header">
+      <p class="form-eyebrow">Survey · 3 steps</p>
+      <h1 class="form-title" id="step-title">Tell us about yourself</h1>
+      <p class="form-subtitle" id="step-subtitle">Start with some basics so we can personalize your experience.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-meta">
+        <span id="progress-label">Step 1 of 3</span>
+        <span id="progress-pct">33%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:33%"></div>
+      </div>
+      <div class="step-dots" id="step-dots"></div>
+    </div>
+
+    <!-- ───────────── STEP 1 ───────────── -->
+    <div class="step active" id="step-1">
+      <p class="section-label">Personal info</p>
+
+      <div class="field">
+        <label for="name">Full name <span class="req">*</span></label>
+        <input type="text" id="name" name="name" placeholder="Jane Smith" autocomplete="name" />
+        <p class="error-msg" id="err-name">Please enter your full name.</p>
+      </div>
+
+      <div class="field">
+        <label for="email">Email address <span class="req">*</span></label>
+        <input type="email" id="email" name="email" placeholder="jane@example.com" autocomplete="email" />
+        <p class="error-msg" id="err-email">Please enter a valid email.</p>
+      </div>
+
+      <div class="field">
+        <label for="role">Your role <span class="req">*</span></label>
+        <select id="role" name="role">
+          <option value="" disabled selected>Select your role…</option>
+          <option value="designer">Designer</option>
+          <option value="developer">Developer</option>
+          <option value="product">Product Manager</option>
+          <option value="marketing">Marketing</option>
+          <option value="executive">Executive / Leadership</option>
+          <option value="other">Other</option>
+        </select>
+        <p class="error-msg" id="err-role">Please select a role.</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goNext(1)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ───────────── STEP 2 ───────────── -->
+    <div class="step" id="step-2">
+      <p class="section-label">Your preferences</p>
+
+      <div class="field">
+        <label>Which features matter most to you? <span class="req">*</span></label>
+        <div class="checkbox-group" id="features">
+          <label class="checkbox-item">
+            <input type="checkbox" name="features" value="analytics" />
+            <span class="check-box">
+              <svg viewBox="0 0 12 10" fill="none"><polyline points="1,5 4,8 11,1" stroke="#0D1117" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="check-label">
+              Analytics &amp; Insights
+              <small>Track performance with real-time dashboards</small>
+            </span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="features" value="collaboration" />
+            <span class="check-box">
+              <svg viewBox="0 0 12 10" fill="none"><polyline points="1,5 4,8 11,1" stroke="#0D1117" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="check-label">
+              Team Collaboration
+              <small>Share, comment and co-edit in real time</small>
+            </span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="features" value="automation" />
+            <span class="check-box">
+              <svg viewBox="0 0 12 10" fill="none"><polyline points="1,5 4,8 11,1" stroke="#0D1117" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="check-label">
+              Workflow Automation
+              <small>Automate repetitive tasks and integrate tools</small>
+            </span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="features" value="security" />
+            <span class="check-box">
+              <svg viewBox="0 0 12 10" fill="none"><polyline points="1,5 4,8 11,1" stroke="#0D1117" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="check-label">
+              Enterprise Security
+              <small>SSO, audit logs, and compliance tools</small>
+            </span>
+          </label>
+        </div>
+        <p class="error-msg" id="err-features">Please select at least one feature.</p>
+      </div>
+
+      <div class="field" style="margin-top:1.5rem">
+        <label>How would you rate your current solution? <span class="req">*</span></label>
+        <div class="rating-group" id="rating-group">
+          <button type="button" class="rating-btn" data-val="1" onclick="selectRating(this)">1</button>
+          <button type="button" class="rating-btn" data-val="2" onclick="selectRating(this)">2</button>
+          <button type="button" class="rating-btn" data-val="3" onclick="selectRating(this)">3</button>
+          <button type="button" class="rating-btn" data-val="4" onclick="selectRating(this)">4</button>
+          <button type="button" class="rating-btn" data-val="5" onclick="selectRating(this)">5</button>
+          <button type="button" class="rating-btn" data-val="6" onclick="selectRating(this)">6</button>
+          <button type="button" class="rating-btn" data-val="7" onclick="selectRating(this)">7</button>
+          <button type="button" class="rating-btn" data-val="8" onclick="selectRating(this)">8</button>
+          <button type="button" class="rating-btn" data-val="9" onclick="selectRating(this)">9</button>
+          <button type="button" class="rating-btn" data-val="10" onclick="selectRating(this)">10</button>
+        </div>
+        <p class="error-msg" id="err-rating">Please select a rating.</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goNext(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ───────────── STEP 3 ───────────── -->
+    <div class="step" id="step-3">
+      <p class="section-label">Final thoughts</p>
+
+      <div class="field">
+        <label for="budget">Budget range <span class="req">*</span></label>
+        <select id="budget" name="budget">
+          <option value="" disabled selected>Select a range…</option>
+          <option value="free">Free / Open source</option>
+          <option value="starter">$1 – $50 / month</option>
+          <option value="growth">$51 – $200 / month</option>
+          <option value="business">$201 – $1,000 / month</option>
+          <option value="enterprise">$1,000+ / month</option>
+        </select>
+        <p class="error-msg" id="err-budget">Please select a budget range.</p>
+      </div>
+
+      <div class="field">
+        <label for="message">Anything else you'd like to share? <span class="req">*</span></label>
+        <div class="textarea-wrap">
+          <textarea id="message" name="message" placeholder="Tell us about your biggest challenge, a feature request, or just say hi…" maxlength="500" oninput="updateCounter(this, 500)"></textarea>
+          <span class="char-counter" id="counter-message">0 / 500</span>
+        </div>
+        <p class="error-msg" id="err-message">Please share a message (min 20 characters).</p>
+      </div>
+
+      <!-- Hidden field for Formspree honeypot anti-spam -->
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goBack(3)">← Back</button>
+        <button class="btn btn-submit" id="submit-btn" onclick="submitForm()">
+          <span class="spinner"></span>
+          <span class="btn-text">Submit Survey ✦</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Autosave badge -->
+    <div class="autosave-badge" id="autosave-badge">
+      <span class="autosave-dot"></span>
+      Progress saved automatically
+    </div>
+
+    <!-- ───────────── THANK YOU ───────────── -->
+    <div class="thank-you" id="thank-you">
+      <span class="ty-icon">🎉</span>
+      <h2 class="ty-title">Thank you!</h2>
+      <p class="ty-msg">Your responses have been recorded.<br>We'll be in touch within 1–2 business days.</p>
+      <div class="ty-detail">
+        <p>📬 A copy of your answers was sent to <strong id="ty-email"></strong></p>
+        <p style="margin-top:0.4rem">If you have questions in the meantime, reply to that email or reach out anytime.</p>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- ═══════════ JAVASCRIPT ═══════════ -->
+  <script>
+    /* ── CONFIG ───────────────────────────────────────────────────────── */
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID"; // ← Replace
+    const GA_MEASUREMENT_ID  = "G-XXXXXXXXXX";                         // ← Replace
+
+    /* ── GA4 LOADER ─────────────────────────────────────────────────────
+       Only loads if you set a real Measurement ID above.
+    ──────────────────────────────────────────────────────────────────── */
+    (function() {
+      if (!GA_MEASUREMENT_ID || GA_MEASUREMENT_ID === "G-XXXXXXXXXX") return;
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_MEASUREMENT_ID;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag("js", new Date());
+      gtag("config", GA_MEASUREMENT_ID);
+    })();
+
+    function gaEvent(name, params) {
+      if (typeof gtag === "function") gtag("event", name, params || {});
+    }
+
+    /* ── STEP METADATA ────────────────────────────────────────────────── */
+    const STEPS = [
+      { title: "Tell us about yourself",    subtitle: "Start with some basics so we can personalize your experience." },
+      { title: "Your preferences",          subtitle: "Help us understand what you're looking for." },
+      { title: "Almost there!",             subtitle: "Just a couple more details and you're done." },
+    ];
+    const TOTAL = STEPS.length;
+    let current = 1;
+    let rating  = null;
+
+    /* ── BUILD DOTS ───────────────────────────────────────────────────── */
+    const dotsEl = document.getElementById("step-dots");
+    for (let i = 1; i <= TOTAL; i++) {
+      const d = document.createElement("div");
+      d.className = "step-dot" + (i === 1 ? " active" : "");
+      d.id = "dot-" + i;
+      dotsEl.appendChild(d);
+    }
+
+    /* ── THEME ────────────────────────────────────────────────────────── */
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute("data-theme") === "dark";
+      html.setAttribute("data-theme", isDark ? "light" : "dark");
+      document.getElementById("theme-icon").textContent  = isDark ? "🌙" : "☀️";
+      document.getElementById("theme-label").textContent = isDark ? "Dark" : "Light";
+      localStorage.setItem("theme", isDark ? "light" : "dark");
+    }
+
+    /* Restore saved theme */
+    (function() {
+      const t = localStorage.getItem("theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+      document.getElementById("theme-icon").textContent  = t === "dark" ? "☀️" : "🌙";
+      document.getElementById("theme-label").textContent = t === "dark" ? "Light" : "Dark";
+    })();
+
+    /* ── PROGRESS UPDATE ──────────────────────────────────────────────── */
+    function updateProgress(step) {
+      const pct = Math.round((step / TOTAL) * 100);
+      document.getElementById("progress-fill").style.width = pct + "%";
+      document.getElementById("progress-label").textContent = "Step " + step + " of " + TOTAL;
+      document.getElementById("progress-pct").textContent   = pct + "%";
+      document.getElementById("step-title").textContent    = STEPS[step - 1].title;
+      document.getElementById("step-subtitle").textContent = STEPS[step - 1].subtitle;
+
+      for (let i = 1; i <= TOTAL; i++) {
+        const d = document.getElementById("dot-" + i);
+        d.className = "step-dot" + (i < step ? " done" : i === step ? " active" : "");
+      }
+    }
+
+    /* ── SHOW STEP ────────────────────────────────────────────────────── */
+    function showStep(n) {
+      document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+      document.getElementById("step-" + n).classList.add("active");
+      updateProgress(n);
+      current = n;
+    }
+
+    /* ── VALIDATION ───────────────────────────────────────────────────── */
+    function clearErrors() {
+      document.querySelectorAll(".error-msg.visible").forEach(e => e.classList.remove("visible"));
+      document.querySelectorAll(".error").forEach(e => e.classList.remove("error"));
+    }
+
+    function showError(field, msgId) {
+      if (field) field.classList.add("error");
+      const msg = document.getElementById(msgId);
+      if (msg) msg.classList.add("visible");
+      return false;
+    }
+
+    function validateStep(n) {
+      clearErrors();
+      let valid = true;
+
+      if (n === 1) {
+        const name  = document.getElementById("name");
+        const email = document.getElementById("email");
+        const role  = document.getElementById("role");
+        if (!name.value.trim())                       { showError(name, "err-name");  valid = false; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { showError(email, "err-email"); valid = false; }
+        if (!role.value)                              { showError(role, "err-role");  valid = false; }
+      }
+
+      if (n === 2) {
+        const checked = document.querySelectorAll('input[name="features"]:checked');
+        if (checked.length === 0) { showError(null, "err-features"); valid = false; }
+        if (!rating)              { showError(null, "err-rating");   valid = false; }
+      }
+
+      if (n === 3) {
+        const budget  = document.getElementById("budget");
+        const message = document.getElementById("message");
+        if (!budget.value)              { showError(budget, "err-budget");   valid = false; }
+        if (message.value.trim().length < 20) { showError(message, "err-message"); valid = false; }
+      }
+
+      return valid;
+    }
+
+    /* ── NAVIGATION ───────────────────────────────────────────────────── */
+    function goNext(from) {
+      if (!validateStep(from)) return;
+      gaEvent("survey_step_complete", { step: from });
+      showStep(from + 1);
+      autoSave();
+    }
+
+    function goBack(from) {
+      showStep(from - 1);
+    }
+
+    /* ── RATING ───────────────────────────────────────────────────────── */
+    function selectRating(btn) {
+      document.querySelectorAll(".rating-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      rating = btn.dataset.val;
+    }
+
+    /* ── CHAR COUNTER ─────────────────────────────────────────────────── */
+    function updateCounter(el, max) {
+      const n = el.value.length;
+      const counter = document.getElementById("counter-" + el.id);
+      counter.textContent = n + " / " + max;
+      counter.className = "char-counter" + (n > max * 0.9 ? " warn" : "") + (n >= max ? " limit" : "");
+      autoSave();
+    }
+
+    /* ── AUTOSAVE ─────────────────────────────────────────────────────── */
+    let saveTimer;
+    function autoSave() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        const data = {
+          name:     document.getElementById("name").value,
+          email:    document.getElementById("email").value,
+          role:     document.getElementById("role").value,
+          budget:   document.getElementById("budget").value,
+          message:  document.getElementById("message").value,
+          rating:   rating,
+          features: [...document.querySelectorAll('input[name="features"]:checked')].map(c => c.value),
+          step:     current,
+        };
+        localStorage.setItem("survey_draft", JSON.stringify(data));
+        const badge = document.getElementById("autosave-badge");
+        badge.classList.add("show");
+        setTimeout(() => badge.classList.remove("show"), 2500);
+      }, 800);
+    }
+
+    /* Restore draft on load */
+    (function restoreDraft() {
+      const raw = localStorage.getItem("survey_draft");
+      if (!raw) return;
+      try {
+        const d = JSON.parse(raw);
+        if (d.name)    document.getElementById("name").value    = d.name;
+        if (d.email)   document.getElementById("email").value   = d.email;
+        if (d.role)    document.getElementById("role").value    = d.role;
+        if (d.budget)  document.getElementById("budget").value  = d.budget;
+        if (d.message) {
+          document.getElementById("message").value = d.message;
+          updateCounter(document.getElementById("message"), 500);
+        }
+        if (d.rating) {
+          rating = d.rating;
+          document.querySelectorAll(".rating-btn").forEach(b => {
+            if (b.dataset.val === d.rating) b.classList.add("selected");
+          });
+        }
+        if (d.features && d.features.length) {
+          d.features.forEach(v => {
+            const cb = document.querySelector('input[name="features"][value="'+v+'"]');
+            if (cb) cb.checked = true;
+          });
+        }
+      } catch(e) { /* ignore */ }
+    })();
+
+    /* Trigger autosave on all text inputs */
+    ["name","email","message"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", autoSave);
+    });
+    ["role","budget"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("change", autoSave);
+    });
+    document.querySelectorAll('input[name="features"]').forEach(cb => {
+      cb.addEventListener("change", autoSave);
+    });
+
+    /* ── SUBMIT ───────────────────────────────────────────────────────── */
+    async function submitForm() {
+      if (!validateStep(3)) return;
+
+      const btn = document.getElementById("submit-btn");
+      btn.classList.add("loading");
+      btn.disabled = true;
+
+      const features = [...document.querySelectorAll('input[name="features"]:checked')].map(c => c.value).join(", ");
+
+      const payload = {
+        name:     document.getElementById("name").value.trim(),
+        email:    document.getElementById("email").value.trim(),
+        role:     document.getElementById("role").value,
+        features: features,
+        rating:   rating,
+        budget:   document.getElementById("budget").value,
+        message:  document.getElementById("message").value.trim(),
+        _replyto: document.getElementById("email").value.trim(),
+        _subject: "New Survey Response from " + document.getElementById("name").value.trim(),
+      };
+
+      try {
+        const res = await fetch(FORMSPREE_ENDPOINT, {
+          method: "POST",
+          headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          gaEvent("survey_complete", { role: payload.role, rating: rating });
+          localStorage.removeItem("survey_draft");
+          showThankYou(payload.email);
+        } else {
+          const data = await res.json();
+          const msg = (data.errors && data.errors[0]?.message) || "Submission failed. Please try again.";
+          alert(msg);
+          btn.classList.remove("loading");
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert("Network error — please check your connection and try again.");
+        btn.classList.remove("loading");
+        btn.disabled = false;
+      }
+    }
+
+    /* ── THANK YOU ────────────────────────────────────────────────────── */
+    function showThankYou(email) {
+      document.getElementById("form-header").style.display   = "none";
+      document.getElementById("progress-wrap").style.display = "none";
+      document.querySelectorAll(".step").forEach(s => s.style.display = "none");
+      document.getElementById("autosave-badge").style.display = "none";
+      document.getElementById("ty-email").textContent = email;
+      document.getElementById("thank-you").classList.add("show");
+    }
+  </script>
+
+</body>
+</html>
