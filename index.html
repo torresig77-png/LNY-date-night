@@ -1,0 +1,876 @@
+<!--
+================================================================================
+  🏮 LUNAR NEW YEAR DATE NIGHT — Fire Horse 2026
+================================================================================
+  FORMSPREE: Replace FORMSPREE_ENDPOINT in the <script> block.
+  GA4:       Replace GA_MEASUREMENT_ID in the <script> block.
+  COLORS:    Edit --primary and --accent in :root below.
+  DEPLOY:    Push as index.html → GitHub repo → Settings → Pages → main/(root)
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏮 Lunar New Year Date Night 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary:      #C0392B;
+      --accent:       #F4C430;
+      --primary-glow: rgba(192,57,43,0.22);
+      --accent-glow:  rgba(244,196,48,0.22);
+    }
+    [data-theme="dark"] {
+      --bg:#0E0A08; --surface:#1C1108; --surf2:#251508;
+      --border:#3D2010; --border2:#5C3018;
+      --text:#F5E6D3; --text2:#B89A80; --text3:#7A5C48;
+      --shadow:rgba(0,0,0,0.72);
+    }
+    [data-theme="light"] {
+      --bg:#FDF6EE; --surface:#FFFFFF; --surf2:#FEF8F2;
+      --border:#E8D5C0; --border2:#D4B896;
+      --text:#2C1810; --text2:#7A5242; --text3:#B09080;
+      --shadow:rgba(80,30,10,0.13);
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+    body {
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg); color:var(--text);
+      min-height:100vh; display:flex; flex-direction:column;
+      align-items:center; padding:0 1rem 5rem;
+      transition:background .4s,color .4s;
+      position:relative; overflow-x:hidden;
+    }
+
+    .deco-line {
+      position:fixed;top:0;left:0;right:0;height:3px;z-index:200;
+      background:linear-gradient(90deg,transparent,var(--primary) 20%,var(--accent) 50%,var(--primary) 80%,transparent);
+    }
+
+    .bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+    .bg-glow::before{
+      content:'';position:absolute;width:700px;height:700px;border-radius:50%;
+      background:radial-gradient(circle,rgba(192,57,43,0.1) 0%,transparent 65%);
+      top:-180px;right:-180px;animation:floatA 14s ease-in-out infinite alternate;
+    }
+    .bg-glow::after{
+      content:'';position:absolute;width:600px;height:600px;border-radius:50%;
+      background:radial-gradient(circle,rgba(244,196,48,0.07) 0%,transparent 65%);
+      bottom:-120px;left:-120px;animation:floatB 18s ease-in-out infinite alternate;
+    }
+    @keyframes floatA{from{transform:translate(0,0)}to{transform:translate(-25px,35px)}}
+    @keyframes floatB{from{transform:translate(0,0)}to{transform:translate(20px,-25px)}}
+
+    .sparkles{position:fixed;inset:0;pointer-events:none;z-index:0;}
+    .spk{
+      position:absolute;width:3px;height:3px;border-radius:50%;
+      background:var(--accent);opacity:0;
+      animation:twinkle var(--d) ease-in-out var(--dl) infinite;
+    }
+    @keyframes twinkle{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.65;transform:scale(1.6)}}
+
+    .theme-btn {
+      position:fixed;top:1.1rem;right:1.1rem;z-index:300;
+      background:var(--surface);border:1px solid var(--border2);border-radius:50px;
+      padding:.4rem .9rem .4rem .65rem;cursor:pointer;
+      font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--text2);
+      display:flex;align-items:center;gap:.4rem;
+      box-shadow:0 2px 12px var(--shadow);transition:all .25s;
+    }
+    .theme-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* ══ HEADER ══ */
+    .page-header {
+      position:relative;z-index:1;text-align:center;
+      padding:3.8rem 1rem 0;margin-bottom:2.4rem;
+      max-width:620px;width:100%;
+    }
+    .hdr-emojis{
+      font-size:2.4rem;letter-spacing:.2em;display:block;margin-bottom:1rem;
+      animation:sway 5s ease-in-out infinite alternate;
+    }
+    @keyframes sway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+    .hdr-eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;}
+    .hdr-viet{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;color:var(--primary);margin-bottom:.55rem;}
+    .hdr-title{
+      font-family:'Cormorant Garamond',serif;
+      font-size:clamp(2.4rem,7vw,3.8rem);font-weight:700;line-height:1.08;letter-spacing:-.01em;
+      background:linear-gradient(135deg,var(--text) 30%,var(--accent) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .ornament{
+      display:flex;align-items:center;gap:.9rem;
+      margin:1.4rem auto 0;color:var(--accent);opacity:.65;font-size:.85rem;letter-spacing:.3em;
+    }
+    .ornament::before,.ornament::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+
+    /* ══ CARD ══ */
+    .card-wrap {
+      position:relative;z-index:1;width:100%;max-width:580px;
+      /* This wrapper is what gets swept away by the horse */
+    }
+    .card {
+      background:var(--surface);border:1px solid var(--border);border-radius:20px;
+      padding:2.5rem 2.5rem 2rem;width:100%;
+      box-shadow:0 0 0 1px var(--border2),0 32px 72px var(--shadow),inset 0 1px 0 rgba(244,196,48,.06);
+      transition:background .4s,border-color .4s;
+      position:relative;overflow:hidden;
+    }
+    .card::before,.card::after{content:'✦';position:absolute;font-size:.65rem;color:var(--accent);opacity:.4;}
+    .card::before{top:1rem;left:1.2rem;}
+    .card::after{top:1rem;right:1.2rem;}
+
+    /* ══ PROGRESS ══ */
+    .prog-wrap{margin-bottom:2rem;}
+    .prog-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.55rem;}
+    .prog-label{font-size:.74rem;color:var(--text3);letter-spacing:.04em;}
+    .prog-pct{font-family:'Cormorant Garamond',serif;font-size:.95rem;color:var(--accent);font-weight:600;}
+    .prog-track{height:3px;border-radius:99px;background:var(--border);overflow:hidden;margin-bottom:.7rem;}
+    .prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .55s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px var(--accent-glow);}
+    .dots{display:flex;gap:.45rem;}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .3s;}
+    .dot.on{background:var(--accent);transform:scale(1.45);box-shadow:0 0 5px var(--accent);}
+    .dot.done{background:var(--primary);opacity:.5;}
+
+    /* ══ STEPS ══ */
+    .step{display:none;}
+    .step.active{display:block;animation:slideIn .36s ease forwards;}
+    @keyframes slideIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+
+    .step-head{margin-bottom:1.75rem;}
+    .step-num{font-size:.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--primary);margin-bottom:.3rem;}
+    .step-title{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:700;color:var(--text);line-height:1.18;}
+    .step-hint{font-size:.8rem;color:var(--text3);margin-top:.35rem;font-style:italic;}
+
+    /* ══ FIELDS ══ */
+    .field{margin-bottom:1.25rem;}
+    .field label{display:block;font-size:.82rem;font-weight:500;color:var(--text2);margin-bottom:.42rem;letter-spacing:.015em;}
+    .req{color:var(--accent);margin-left:1px;}
+
+    .field input[type="text"],
+    .field input[type="email"],
+    .field select,
+    .field textarea {
+      width:100%;background:var(--surf2);
+      border:1.5px solid var(--border2);border-radius:10px;
+      padding:.72rem 1rem;color:var(--text);
+      font-family:'DM Sans',sans-serif;font-size:.9rem;
+      outline:none;-webkit-appearance:none;
+      transition:border-color .25s,box-shadow .25s,background .25s;
+    }
+    .field select{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23F4C430' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 1rem center;
+      padding-right:2.5rem;cursor:pointer;
+    }
+    .field select option{background:var(--surface);}
+    .field textarea{resize:vertical;min-height:100px;}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);background:var(--surface);}
+    .field input.error,.field select.error,.field textarea.error{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);}
+
+    /* textarea counter */
+    .ta-wrap{position:relative;}
+    .char-cnt{position:absolute;bottom:.55rem;right:.75rem;font-size:.7rem;color:var(--text3);pointer-events:none;transition:color .2s;}
+    .char-cnt.warn{color:var(--accent);}
+    .char-cnt.over{color:#E74C3C;}
+
+    /* errors */
+    .err{font-size:.76rem;color:var(--primary);margin-top:.28rem;display:none;align-items:center;gap:.3rem;}
+    .err.show{display:flex;}
+    .err::before{content:'◆';font-size:.5rem;}
+
+
+
+    /* ══ RADIO CARDS ══ */
+    .radio-cards{display:flex;flex-direction:column;gap:.65rem;}
+    .r-card{
+      display:flex;align-items:center;gap:.9rem;
+      padding:.85rem 1rem;border-radius:12px;
+      border:1.5px solid var(--border2);background:var(--surf2);
+      cursor:pointer;transition:all .22s;
+    }
+    .r-card:hover{border-color:var(--accent);background:var(--surface);}
+    .r-card input[type="radio"]{display:none;}
+    .r-dot{
+      width:18px;min-width:18px;height:18px;border-radius:50%;
+      border:2px solid var(--border2);background:var(--surf2);
+      display:flex;align-items:center;justify-content:center;
+      transition:all .2s;
+    }
+    .r-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:0;transition:opacity .2s;}
+    .r-card input:checked ~ .r-dot{border-color:var(--accent);}
+    .r-card input:checked ~ .r-dot::after{opacity:1;}
+    .r-card:has(input:checked){border-color:var(--accent);background:rgba(244,196,48,.06);box-shadow:0 0 0 1px var(--accent-glow);}
+    .r-info{flex:1;}
+    .r-title{font-size:.92rem;font-weight:500;color:var(--text);}
+    .r-sub{font-size:.76rem;color:var(--text3);margin-top:2px;}
+    .r-emoji{font-size:1.4rem;}
+
+    /* ══ CHECKBOXES ══ */
+    .check-col{display:flex;flex-direction:column;gap:.6rem;}
+    .chk{display:flex;align-items:flex-start;gap:.65rem;cursor:pointer;}
+    .chk input[type="checkbox"]{display:none;}
+    .chk-box{
+      width:20px;min-width:20px;height:20px;border-radius:5px;
+      border:1.5px solid var(--border2);background:var(--surf2);
+      display:flex;align-items:center;justify-content:center;
+      transition:all .2s;margin-top:2px;
+    }
+    .chk-box svg{display:none;width:10px;height:10px;}
+    .chk input:checked ~ .chk-box{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+    .chk input:checked ~ .chk-box svg{display:block;}
+    .chk:hover .chk-box{border-color:var(--accent);}
+    .chk-lbl{font-size:.9rem;line-height:1.5;color:var(--text);}
+    .chk-lbl small{display:block;font-size:.75rem;color:var(--text3);margin-top:1px;}
+
+    .divider{display:flex;align-items:center;gap:.7rem;margin:1.4rem 0 1.3rem;color:var(--text3);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* ══ BUTTONS ══ */
+    .btn-row{display:flex;gap:.75rem;margin-top:2rem;}
+    .btn{font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;padding:.75rem 1.5rem;border-radius:10px;border:none;cursor:pointer;transition:all .22s;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;}
+    .btn-next{flex:1;background:linear-gradient(135deg,var(--primary) 0%,#A93226 100%);color:#FDF6EE;box-shadow:0 4px 16px rgba(192,57,43,.3);}
+    .btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(192,57,43,.42);}
+    .btn-next:active{transform:translateY(0);}
+    .btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+    .btn-back{background:transparent;border:1.5px solid var(--border2);color:var(--text2);padding:.75rem 1.15rem;}
+    .btn-back:hover{border-color:var(--text2);color:var(--text);}
+    .btn-sub{flex:1;background:linear-gradient(135deg,var(--accent) 0%,#D4AB00 100%);color:#1A0A00;font-weight:600;box-shadow:0 4px 16px rgba(244,196,48,.28);}
+    .btn-sub:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(244,196,48,.45);}
+    .btn-sub:active{transform:translateY(0);}
+    .btn-sub:disabled{opacity:.55;cursor:not-allowed;transform:none !important;}
+    .spinner{display:none;width:15px;height:15px;border:2px solid rgba(26,10,0,.25);border-top-color:#1A0A00;border-radius:50%;animation:spin .7s linear infinite;}
+    .loading .spinner{display:block;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .save-badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--accent);opacity:0;transition:opacity .5s;margin-top:.75rem;}
+    .save-badge.show{opacity:1;}
+    .save-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+
+
+    /* ══════════════════════════════════════════════════════
+       FIRE HORSE GALLOP TRANSITION
+       The horse runs left→right across the viewport,
+       dragging the card off-screen with it.
+    ══════════════════════════════════════════════════════ */
+
+    /* The horse emoji that gallops across */
+    #gallop-horse {
+      position: fixed;
+      /* Start just off the LEFT edge, vertically centered-ish */
+      left: -140px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 6rem;
+      z-index: 2000;
+      pointer-events: none;
+      filter: drop-shadow(0 0 20px #F4C430) drop-shadow(0 0 40px #C0392B);
+      display: none;
+      /* Legs bob animation */
+      animation: horseBob 0.22s steps(2) infinite;
+    }
+    #gallop-horse.running {
+      display: block;
+      animation: horseGallop 1.5s cubic-bezier(.4,0,.6,1) forwards,
+                 horseBob 0.2s steps(2) infinite;
+    }
+    @keyframes horseGallop {
+      0%   { left: -140px; }
+      100% { left: calc(100vw + 40px); }
+    }
+    @keyframes horseBob {
+      0%   { transform: translateY(-50%) rotate(-3deg) scaleX(-1); }
+      50%  { transform: translateY(calc(-50% - 8px)) rotate(3deg) scaleX(-1); }
+      100% { transform: translateY(-50%) rotate(-3deg) scaleX(-1); }
+    }
+
+    /* Fire trail that follows the horse */
+    .fire-trail {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 1999;
+      display: none;
+    }
+    .fire-trail.running { display: block; }
+
+    .ft-particle {
+      position: fixed;
+      top: 50%;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1998;
+      opacity: 0;
+    }
+    .ft-particle.burst {
+      animation: trailBurst var(--td) ease-out forwards;
+    }
+    @keyframes trailBurst {
+      0%   { opacity: .9; transform: translateY(-50%) scale(1) translate(0,0); }
+      100% { opacity: 0; transform: translateY(calc(-50% + var(--ty))) scale(.2) translateX(var(--tx)); }
+    }
+
+    /* The card sweeping off to the right */
+    .card-wrap {
+      transition: none;
+    }
+    .card-wrap.sweep-right {
+      animation: cardSweep 1.4s cubic-bezier(.4,0,.8,1) forwards;
+    }
+    @keyframes cardSweep {
+      0%   { transform: translateX(0);   opacity: 1; }
+      60%  { transform: translateX(0);   opacity: 1; }   /* horse arrives first */
+      100% { transform: translateX(120vw); opacity: 0; }
+    }
+
+    /* Ground fire streak */
+    #ground-fire {
+      position: fixed;
+      top: 50%;
+      left: 0; right: 0;
+      height: 4px;
+      margin-top: 46px;
+      background: linear-gradient(90deg, transparent, #FF6B00, #F4C430, transparent);
+      z-index: 1997;
+      display: none;
+      animation: groundStreak 1.5s ease-in-out forwards;
+    }
+    #ground-fire.running { display: block; }
+    @keyframes groundStreak {
+      0%   { opacity: 0; transform: scaleX(0); transform-origin: left; }
+      20%  { opacity: .8; transform: scaleX(.4); }
+      60%  { opacity: 1; transform: scaleX(1); }
+      100% { opacity: 0; transform: scaleX(1); }
+    }
+
+
+    /* ══ THANK YOU ══ */
+    .ty{display:none;text-align:center;padding:1.5rem 0 .5rem;}
+    .ty.show{display:block;animation:slideIn .5s ease forwards;}
+    .ty-icon{font-size:3rem;display:block;margin-bottom:1.1rem;animation:popUp .65s cubic-bezier(.34,1.56,.64,1) forwards;}
+    @keyframes popUp{from{opacity:0;transform:translateY(16px) scale(.7)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .ty-date{
+      font-family:'Cormorant Garamond',serif;
+      font-size:clamp(2.8rem,10vw,4.5rem);font-weight:700;line-height:1;
+      background:linear-gradient(135deg,var(--text) 20%,var(--accent) 70%,var(--primary) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;margin-bottom:.4rem;letter-spacing:-.02em;
+    }
+    .ty-sub-date{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6;}
+    .ty-box{background:var(--surf2);border:1px solid var(--border2);border-radius:14px;padding:1.2rem 1.3rem;text-align:left;margin-bottom:1rem;}
+    .ty-row{display:flex;align-items:baseline;gap:.6rem;font-size:.85rem;color:var(--text2);line-height:1.7;}
+    .ty-row+.ty-row{margin-top:.35rem;}
+    .ty-row .ico{font-size:1rem;}
+    .ty-row strong{color:var(--text);}
+    .ty-viet{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:var(--primary);margin-top:1rem;opacity:.8;}
+
+    @media(max-width:480px){
+      .card{padding:1.75rem 1.2rem 1.5rem;}
+      .page-header{padding-top:2.8rem;}
+      #gallop-horse{font-size:4rem;}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deco-line"></div>
+  <div class="bg-glow"></div>
+  <div class="sparkles" id="sparkles"></div>
+
+  <!-- Galloping horse elements -->
+  <div id="gallop-horse">🐎</div>
+  <div id="ground-fire"></div>
+
+  <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span id="t-icon">☀️</span>
+    <span id="t-lbl">Light</span>
+  </button>
+
+  <!-- ══ HEADER ══ -->
+  <header class="page-header">
+    <span class="hdr-emojis">🏮 🐎 🏮</span>
+    <p class="hdr-eyebrow">Year of the Fire Horse · 2026</p>
+    <p class="hdr-viet">Chúc Mừng Năm Mới</p>
+    <h1 class="hdr-title">Lunar New Year<br>Date Night</h1>
+    <div class="ornament">✦ ✦ ✦</div>
+  </header>
+
+  <!-- ══ CARD WRAPPER (this gets swept away) ══ -->
+  <div class="card-wrap" id="card-wrap">
+  <div class="card" id="card">
+
+    <div class="prog-wrap" id="prog-wrap">
+      <div class="prog-meta">
+        <span class="prog-label" id="prog-label">Step 1 of 2</span>
+        <span class="prog-pct" id="prog-pct">50%</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:50%"></div></div>
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <!-- ═══ STEP 1 ═══ -->
+    <div class="step active" id="step-1">
+      <div class="step-head">
+        <p class="step-num">Step 1</p>
+        <h2 class="step-title">Enter name to unlock 🔐</h2>
+        <p class="step-hint">Wrong answers only.</p>
+      </div>
+      <div class="field">
+        <label for="name1">Your name <span class="req">*</span></label>
+        <input type="text" id="name1" name="name1" placeholder="Who's that girl dressed as a kiwi?" autocomplete="off"
+          oninput="checkWrongAnswer(this)" />
+        <p class="err" id="e-n1">You have to enter something, even if it's wrong.</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-next" id="unlock-btn" onclick="goNext(1)" disabled>
+          Unlock 🐎
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 2 ═══ -->
+    <div class="step" id="step-2">
+      <div class="step-head">
+        <p class="step-num">Step 2 · The Plan</p>
+        <h2 class="step-title">Let's plan our night 🥢</h2>
+      </div>
+
+      <!-- DINNER -->
+      <div class="field">
+        <label>What are you feeling? <span class="req">*</span></label>
+        <div class="radio-cards" id="vibe-group">
+          <label class="r-card">
+            <input type="radio" name="vibe" value="sushi" onchange="autoSave()" />
+            <span class="r-dot"></span>
+            <span class="r-emoji">🍣</span>
+            <span class="r-info">
+              <span class="r-title">Sushi</span>
+              <span class="r-sub">Fresh cuts, good vibes, cold sake</span>
+            </span>
+          </label>
+          <label class="r-card">
+            <input type="radio" name="vibe" value="dtf" onchange="autoSave()" />
+            <span class="r-dot"></span>
+            <span class="r-emoji">🥟</span>
+            <span class="r-info">
+              <span class="r-title">DTF — Din Tai Fung… duh</span>
+              <span class="r-sub"></span>
+            </span>
+          </label>
+          <label class="r-card">
+            <input type="radio" name="vibe" value="homecooked" onchange="autoSave()" />
+            <span class="r-dot"></span>
+            <span class="r-emoji">🍹</span>
+            <span class="r-info">
+              <span class="r-title">Home-cooked meal, dessert &amp; margs</span>
+              <span class="r-sub">Cozy night in, made by Chef Ali</span>
+            </span>
+          </label>
+          <label class="r-card">
+            <input type="radio" name="vibe" value="viet" onchange="autoSave()" />
+            <span class="r-dot"></span>
+            <span class="r-emoji">🍜</span>
+            <span class="r-info">
+              <span class="r-title">Viet fusion restaurant</span>
+              <span class="r-sub"></span>
+            </span>
+          </label>
+          <label class="r-card" id="r-card-custom">
+            <input type="radio" name="vibe" value="custom" onchange="toggleCustomIdea(true);autoSave()" />
+            <span class="r-dot"></span>
+            <span class="r-emoji">💡</span>
+            <span class="r-info">
+              <span class="r-title">I have an idea…</span>
+              <span class="r-sub">Recs are encouraged if you've been craving something</span>
+            </span>
+          </label>
+        </div>
+        <div class="custom-idea-wrap" id="custom-idea-wrap" style="display:none;margin-top:.75rem;">
+          <div class="ta-wrap">
+            <textarea id="custom-idea" name="custom_idea" maxlength="300"
+              placeholder="What are you craving? Spill it…"
+              oninput="updateCounter(this,300);autoSave();"></textarea>
+            <span class="char-cnt" id="cnt-custom-idea">0 / 300</span>
+          </div>
+          <p class="err" id="e-custom">Tell us your idea!</p>
+        </div>
+        <p class="err" id="e-vibe">Please pick a dinner vibe.</p>
+      </div>
+
+      <div class="divider">Post-dinner activity</div>
+
+      <div class="field">
+        <label>What are we doing after?
+          <small style="font-weight:400;color:var(--text3)">(pick all that apply)</small>
+        </label>
+        <div class="check-col" id="activity-group">
+          <label class="chk">
+            <input type="checkbox" name="activity" value="paint" onchange="autoSave()" />
+            <span class="chk-box"><svg viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,7 9,1" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="chk-lbl">🎨 Paint<small>Brushes out, vibes immaculate</small></span>
+          </label>
+          <label class="chk">
+            <input type="checkbox" name="activity" value="movies" onchange="autoSave()" />
+            <span class="chk-box"><svg viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,7 9,1" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="chk-lbl">🎬 Movies<small>Couch locked, snacks mandatory</small></span>
+          </label>
+          <label class="chk">
+            <input type="checkbox" name="activity" value="boardgames" onchange="autoSave()" />
+            <span class="chk-box"><svg viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,7 9,1" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="chk-lbl">🎲 Board games<small>May the best player win...winner gets a kiss</small></span>
+          </label>
+        </div>
+        <!-- No required marker — Kiwi's choice can bypass this -->
+      </div>
+
+      <!-- KIWI'S CHOICE -->
+      <div class="field">
+        <label for="kiwi">Kiwi's choice 🥝 <small style="font-weight:400;color:var(--text3)">— fills this in instead of picking above</small></label>
+        <div class="ta-wrap">
+          <textarea id="kiwi" name="kiwi_choice" maxlength="300"
+            placeholder="Whatever Kiwi wants, Kiwi gets…"
+            oninput="updateCounter(this,300);autoSave();"></textarea>
+          <span class="char-cnt" id="cnt-kiwi">0 / 300</span>
+        </div>
+      </div>
+
+      <p class="err" id="e-act">Please pick an activity OR fill in Kiwi's choice above.</p>
+
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goBack(2)">← Back</button>
+        <button class="btn btn-sub" id="sub-btn" onclick="submitForm()">
+          <span class="spinner"></span>
+          <span class="btn-txt">Submit 🐎</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="save-badge" id="save-badge">
+      <span class="save-dot"></span> Progress saved
+    </div>
+
+    <!-- ═══ THANK YOU ═══ -->
+    <div class="ty" id="ty">
+      <span class="ty-icon">🏮🐎🏮</span>
+      <h2 class="ty-date">See you 2/25</h2>
+      <p class="ty-sub-date">evening 🌙</p>
+      <div class="ty-box">
+        <div class="ty-row">
+          <span class="ico">📅</span>
+          <span>Your date night is locked in for <strong>February 25th</strong> — get excited!</span>
+        </div>
+        <div class="ty-row">
+          <span class="ico">✨</span>
+          <span>Details coming your way soon. All you have to do is <strong>show up.</strong></span>
+        </div>
+        <div class="ty-row">
+          <span class="ico">🐎</span>
+          <span><strong id="ty-name-horse">The Fire Horse</strong> has spoken — <strong>this is going to be a great year.</strong></span>
+        </div>
+      </div>
+      <p class="ty-viet">Chúc Mừng Năm Mới 🏮</p>
+    </div>
+
+  </div><!-- /card -->
+  </div><!-- /card-wrap -->
+
+  <script>
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/xwvnwdny";
+    const GA_MEASUREMENT_ID  = "G-XXXXXXXXXX";
+
+    /* ── GA4 ── */
+    (function(){
+      if(!GA_MEASUREMENT_ID||GA_MEASUREMENT_ID==="G-XXXXXXXXXX") return;
+      const s=document.createElement("script");s.async=true;
+      s.src="https://www.googletagmanager.com/gtag/js?id="+GA_MEASUREMENT_ID;
+      document.head.appendChild(s);
+      window.dataLayer=window.dataLayer||[];
+      function gtag(){dataLayer.push(arguments);}window.gtag=gtag;
+      gtag("js",new Date());gtag("config",GA_MEASUREMENT_ID);
+    })();
+    function ga(n,p){if(typeof gtag==="function")gtag("event",n,p||{});}
+
+    /* ── SPARKLES ── */
+    (function(){
+      const c=document.getElementById("sparkles");
+      for(let i=0;i<24;i++){
+        const el=document.createElement("div");el.className="spk";
+        el.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2.5+Math.random()*4}s;--dl:${Math.random()*6}s;`;
+        c.appendChild(el);
+      }
+    })();
+
+    /* ── STEPS ── */
+    const TOTAL=2;let current=1;
+    const dotsEl=document.getElementById("dots");
+    for(let i=1;i<=TOTAL;i++){
+      const d=document.createElement("div");
+      d.className="dot"+(i===1?" on":"");d.id="d"+i;
+      dotsEl.appendChild(d);
+    }
+    function updateProg(n){
+      const pct=Math.round((n/TOTAL)*100);
+      document.getElementById("prog-fill").style.width=pct+"%";
+      document.getElementById("prog-label").textContent="Step "+n+" of "+TOTAL;
+      document.getElementById("prog-pct").textContent=pct+"%";
+      for(let i=1;i<=TOTAL;i++){
+        const d=document.getElementById("d"+i);
+        d.className="dot"+(i<n?" done":i===n?" on":"");
+      }
+    }
+    function showStep(n){
+      document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+      document.getElementById("step-"+n).classList.add("active");
+      updateProg(n);current=n;
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    /* ── THEME ── */
+    function toggleTheme(){
+      const h=document.documentElement;
+      const dark=h.getAttribute("data-theme")==="dark";
+      h.setAttribute("data-theme",dark?"light":"dark");
+      document.getElementById("t-icon").textContent=dark?"🌙":"☀️";
+      document.getElementById("t-lbl").textContent=dark?"Dark":"Light";
+      localStorage.setItem("lny-theme",dark?"light":"dark");
+    }
+    (function(){
+      const t=localStorage.getItem("lny-theme")||"dark";
+      document.documentElement.setAttribute("data-theme",t);
+      document.getElementById("t-icon").textContent=t==="dark"?"☀️":"🌙";
+      document.getElementById("t-lbl").textContent=t==="dark"?"Light":"Dark";
+    })();
+
+    /* ── WRONG ANSWERS ONLY — any input unlocks the button ── */
+    function checkWrongAnswer(input) {
+      document.getElementById("unlock-btn").disabled = input.value.trim().length === 0;
+      autoSave();
+    }
+
+
+
+    /* ── VALIDATION ── */
+    function clearErr(){
+      document.querySelectorAll(".err.show").forEach(e=>e.classList.remove("show"));
+      document.querySelectorAll(".error").forEach(e=>e.classList.remove("error"));
+    }
+    function fail(el,id){
+      if(el)el.classList.add("error");
+      const m=document.getElementById(id);if(m)m.classList.add("show");
+    }
+
+    function validate(n){
+      clearErr();let ok=true;
+      if(n===1){
+        const n1=document.getElementById("name1");
+        if(!n1.value.trim()){fail(n1,"e-n1");ok=false;}
+      }
+      if(n===2){
+        const vibe=document.querySelector('input[name="vibe"]:checked');
+        const acts=document.querySelectorAll('input[name="activity"]:checked');
+        const kiwi=document.getElementById("kiwi").value.trim();
+        const customIdea=document.getElementById("custom-idea").value.trim();
+        if(!vibe){fail(null,"e-vibe");ok=false;}
+        // If "I have an idea" selected, the text field is required
+        if(vibe && vibe.value==="custom" && !customIdea){fail(null,"e-custom");ok=false;}
+        // Activities only required if Kiwi's choice is also empty
+        if(!acts.length && !kiwi){fail(null,"e-act");ok=false;}
+      }
+      return ok;
+    }
+
+    function goNext(from){
+      if(!validate(from)) return;
+      ga("step_complete",{step:from});
+      showStep(from+1);autoSave();
+    }
+    function goBack(from){showStep(from-1);}
+
+    function updateCounter(el,max){
+      const n=el.value.length;
+      const c=document.getElementById("cnt-"+el.id);
+      c.textContent=n+" / "+max;
+      c.className="char-cnt"+(n>=max?" over":n>max*.85?" warn":"");
+    }
+
+    /* ── AUTOSAVE ── */
+    let saveT;
+    function autoSave(){
+      clearTimeout(saveT);
+      saveT=setTimeout(()=>{
+        const vib=document.querySelector('input[name="vibe"]:checked');
+        const data={
+          name1:document.getElementById("name1").value,
+          vibe:vib?vib.value:"",
+          activities:[...document.querySelectorAll('input[name="activity"]:checked')].map(c=>c.value),
+          kiwi:document.getElementById("kiwi").value,
+          customIdea:document.getElementById("custom-idea").value,
+          step:current,
+        };
+        localStorage.setItem("lny_draft3",JSON.stringify(data));
+        const b=document.getElementById("save-badge");
+        b.classList.add("show");setTimeout(()=>b.classList.remove("show"),2500);
+      },900);
+    }
+    (function(){
+      const raw=localStorage.getItem("lny_draft3");
+      if(!raw) return;
+      try{
+        const d=JSON.parse(raw);
+        if(d.name1){
+          document.getElementById("name1").value=d.name1;
+          // Re-trigger the unlock check silently
+          if(d.name1.trim()){
+            document.getElementById("unlock-btn").disabled=false;
+          }
+        }
+        if(d.vibe){const r=document.querySelector('input[name="vibe"][value="'+d.vibe+'"]');if(r)r.checked=true;}
+        if(d.activities)d.activities.forEach(v=>{const cb=document.querySelector('input[name="activity"][value="'+v+'"]');if(cb)cb.checked=true;});
+        if(d.kiwi){document.getElementById("kiwi").value=d.kiwi;updateCounter(document.getElementById("kiwi"),300);}
+        if(d.customIdea){document.getElementById("custom-idea").value=d.customIdea;updateCounter(document.getElementById("custom-idea"),300);}
+      }catch(e){}
+    })();
+
+    /* ══════════════════════════════════════════════════════
+       FIRE HORSE GALLOP TRANSITION
+       1. Horse gallops in from the left
+       2. Simultaneously, fire trail particles burst
+       3. When horse is ~60% across, card starts sweeping right
+       4. When animation ends, horse + ground fire vanish, thank you appears
+    ══════════════════════════════════════════════════════ */
+    function spawnTrailParticle(x) {
+      const colors = ["#FF6B00","#F4C430","#FF4500","#FFD700","#C0392B","#FF8C00"];
+      const el = document.createElement("div");
+      el.className = "ft-particle";
+      const size = (8 + Math.random()*16) + "px";
+      const tx   = (Math.random() * 40 - 20) + "px";
+      const ty   = (Math.random() * 60 - 10) + "px";
+      const dur  = (.4 + Math.random()*.5) + "s";
+      el.style.cssText = `
+        width:${size};height:${size};
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        left:${x}px;
+        --td:${dur};--tx:${tx};--ty:${ty};
+      `;
+      document.body.appendChild(el);
+      // Force reflow then add class
+      void el.offsetWidth;
+      el.classList.add("burst");
+      setTimeout(()=>el.remove(), 1000);
+    }
+
+    async function runHorseTransition() {
+      const horse = document.getElementById("gallop-horse");
+      const groundFire = document.getElementById("ground-fire");
+      const cardWrap = document.getElementById("card-wrap");
+
+      // Kick off horse + ground fire
+      horse.classList.add("running");
+      groundFire.classList.add("running");
+
+      // Spawn trail particles as the horse moves
+      let trailInterval = setInterval(() => {
+        // Estimate horse x position based on elapsed time
+        const rect = horse.getBoundingClientRect();
+        spawnTrailParticle(rect.left + rect.width * .2);
+      }, 60);
+
+      // After 700ms the horse is roughly over the card — start sweep
+      await new Promise(r => setTimeout(r, 700));
+      cardWrap.classList.add("sweep-right");
+
+      // After full gallop (1500ms total) clean up and show thanks
+      await new Promise(r => setTimeout(r, 900));
+      clearInterval(trailInterval);
+
+      horse.classList.remove("running");
+      groundFire.classList.remove("running");
+      horse.style.display = "none";
+
+      showThanks();
+    }
+
+    function toggleCustomIdea(show) {
+      const wrap = document.getElementById("custom-idea-wrap");
+      wrap.style.display = show ? "block" : "none";
+      if (!show) {
+        const el = document.getElementById("custom-idea");
+        el.value = "";
+        document.getElementById("cnt-custom-idea").textContent = "0 / 300";
+      }
+    }
+
+    // Wire vibe radios: toggle custom field + autosave
+    document.querySelectorAll('input[name="vibe"]').forEach(r => {
+      r.addEventListener("change", function() {
+        toggleCustomIdea(this.value === "custom");
+        autoSave();
+      });
+    });
+    document.querySelectorAll('input[name="activity"]').forEach(el => el.addEventListener("change", autoSave));
+    document.getElementById("name1").addEventListener("input", autoSave);
+    document.getElementById("kiwi").addEventListener("input", autoSave);
+
+    async function submitForm(){
+      if(!validate(2)) return;
+
+      const btn=document.getElementById("sub-btn");
+      btn.classList.add("loading");btn.disabled=true;
+
+      const vib=document.querySelector('input[name="vibe"]:checked');
+      const customIdea = document.getElementById("custom-idea").value.trim();
+      const payload={
+        name:          document.getElementById("name1").value.trim(),
+        dinner_vibe:   vib && vib.value === "custom" ? "Custom: "+customIdea : (vib?vib.value:""),
+        activities:    [...document.querySelectorAll('input[name="activity"]:checked')].map(c=>c.value).join(", "),
+        kiwis_choice:  document.getElementById("kiwi").value.trim(),
+        _subject:      "🐎 LNY Date Night — "+document.getElementById("name1").value.trim(),
+      };
+
+      // Fire the Formspree request in parallel with the animation
+      const submitPromise = fetch(FORMSPREE_ENDPOINT,{
+        method:"POST",
+        headers:{"Accept":"application/json","Content-Type":"application/json"},
+        body:JSON.stringify(payload),
+      }).catch(()=>null); // silent fail — show thanks regardless
+
+      // Run the horse 🐎
+      await runHorseTransition();
+
+      // Await the request just in case it's still in flight
+      await submitPromise;
+
+      ga("form_submit",{form:"lny_date_night_2026"});
+      localStorage.removeItem("lny_draft3");
+    }
+
+    function showThanks(){
+      document.getElementById("prog-wrap").style.display="none";
+      document.querySelectorAll(".step").forEach(s=>s.style.display="none");
+      document.getElementById("save-badge").style.display="none";
+      // Inject the wrong-answer name into the Fire Horse line
+      const enteredName = document.getElementById("name1").value.trim();
+      if(enteredName) {
+        document.getElementById("ty-name-horse").textContent = enteredName;
+      }
+      // Reset card position so thank you renders cleanly
+      const cw=document.getElementById("card-wrap");
+      cw.classList.remove("sweep-right");
+      cw.style.transform="none";
+      document.getElementById("ty").classList.add("show");
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  </script>
+</body>
+</html>
